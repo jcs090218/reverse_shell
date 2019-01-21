@@ -27,6 +27,16 @@ class Command(enum.Enum):
 
 
 def is_internal_command(in_cmd):
+    """Check if the `in_cmd' the internal command.
+
+    @param { string } in_cmd : Target command to check.
+    """
+    for it in Command:
+        if it.value == in_cmd:
+            return True
+    return False
+
+def is_internal_command_prefix(in_cmd):
     """Check if the current command the internal command.
 
     @param { string } in_cmd : Input command.
