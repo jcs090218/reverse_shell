@@ -9,6 +9,8 @@
 
 import enum
 
+import constant
+
 
 class Command(enum.Enum):
     """List of command type."""
@@ -22,3 +24,11 @@ class Command(enum.Enum):
 
     # Download
     DOWNLOAD = "dwn"
+
+
+def is_internal_command(in_cmd):
+    """Check if the current command the internal command.
+
+    @param { string } in_cmd : Input command.
+    """
+    return in_cmd[:1] == constant.INTERNAL_CMD_PREFIX
