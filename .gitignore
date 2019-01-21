@@ -1,0 +1,15 @@
+/.git
+/.settings
+
+# ignore lib
+/lib
+
+# ignore these extension
+*.pyc
+
+# ignore these directory
+/build
+/dist
+
+# ignore scripts
+/scripts
