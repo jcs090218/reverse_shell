@@ -12,4 +12,9 @@
 /dist
 
 # ignore scripts
-/scripts
+/scripts/run.bat
+/scripts/run.sh
+/scripts/run_attacker.bat
+/scripts/run_attacker.sh
+/scripts/run_target.bat
+/scripts/run_target.sh
