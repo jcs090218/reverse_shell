@@ -6,6 +6,7 @@ Desc...
 
 ## Features ##
 ### Implemented ###
+* Auto reconnection
 * Downloader (Download file to target machine)
 * Screenshot
 * Full control on the target machine.
@@ -15,7 +16,7 @@ Desc...
 
 
 ## TODOs ##
-* Auto reconnection
+* Bluescreen (Fake)
 * Hidden IP
 * Hidden terminal
 * Multi-target listening
