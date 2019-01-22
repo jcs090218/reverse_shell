@@ -23,7 +23,20 @@ class Command(enum.Enum):
     SCREENSHOT = "screenshot"
 
     # Download
-    DOWNLOAD = "dwn"
+    DOWNLOAD = "dl"
+
+
+def get_cmd_params(full_cmd):
+    """Get the command and all parameters.
+
+    @param { string } full_cmd : Full command string.
+    """
+    parts = full_cmd.split(" ")
+
+    cmd = parts[0]
+    params = parts[1:]
+
+    return (cmd, params)
 
 
 def is_internal_command(in_cmd):
