@@ -29,6 +29,5 @@ def __log(in_title, in_str):
     @param { typename } in_title : Title of the message.
     @param { typename } in_str : Log content.
     """
-    timestamp = datetime.datetime.now()
-
+    timestamp = f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}"
     print(f"* [{in_title}] ({timestamp}) {in_str} ")
