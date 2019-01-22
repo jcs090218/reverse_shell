@@ -37,7 +37,7 @@ def process_cmd_continue(in_cmd):
 
     return False
 
-def wait_shell_cmd(path):
+def get_shell_cmd(path):
     """Prompt the shell info, and receive command input.
 
     @param { string } path : Shell path to prompt.
@@ -52,17 +52,20 @@ def wait_shell_cmd(path):
         in_cmd = input(path + "$ ")
         rl_cmd = in_cmd
 
+        cmd, params = command.get_cmd_params(in_cmd)
+
         # Check if is internal command type.
-        iicp = command.is_internal_command_prefix(in_cmd)
+        iicp = command.is_internal_command_prefix(cmd)
         iic = False
         if iicp:
             # Remove prefix, get the internal command.
-            rl_cmd = in_cmd[1:]
+            rl_cmd = cmd[1:]
             iic = command.is_internal_command(rl_cmd)
             if not iic:
                 logger.error(f"'{in_cmd}' is not recognized internal command.")
                 continue
         got_input = True
+
     return (in_cmd, iic, rl_cmd)
 
 def __resolve_hp():
@@ -100,7 +103,7 @@ def main():
                     # Receive shell info.
                     path = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
 
-                    in_cmd, iic, rl_cmd = wait_shell_cmd(path)
+                    in_cmd, iic, rl_cmd = get_shell_cmd(path)
 
                     # Check shutdown command before receiving.
                     if iic:
