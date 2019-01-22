@@ -19,3 +19,6 @@ DECODE_TYPE = 'utf-8'
 
 # Internal command prefix, must be a character.
 INTERNAL_CMD_PREFIX = '!'
+
+# Reconnection
+RECONNECT_INTERVAL = 60 * 5  # in seconds
