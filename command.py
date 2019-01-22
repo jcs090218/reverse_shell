@@ -39,19 +39,19 @@ def get_cmd_params(full_cmd):
     return (cmd, params)
 
 
-def is_internal_command(in_cmd):
-    """Check if the `in_cmd' the internal command.
+def is_internal_command(full_cmd):
+    """Check if the `full_cmd' the internal command.
 
-    @param { string } in_cmd : Target command to check.
+    @param { string } full_cmd : Target command to check.
     """
     for it in Command:
-        if it.value == in_cmd:
+        if it.value == full_cmd:
             return True
     return False
 
-def is_internal_command_prefix(in_cmd):
+def is_internal_command_prefix(full_cmd):
     """Check if the current command the internal command.
 
-    @param { string } in_cmd : Input command.
+    @param { string } full_cmd : Input command.
     """
-    return in_cmd[:1] == constant.INTERNAL_CMD_PREFIX
+    return full_cmd[:1] == constant.INTERNAL_CMD_PREFIX
