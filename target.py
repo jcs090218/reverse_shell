@@ -17,6 +17,7 @@ import command
 import constant
 import downloader
 import logger
+import screenshot
 
 
 DEFAULT_LOCALE = []
@@ -69,6 +70,7 @@ def main():
 
 
             cmd, params = command.get_cmd_params(full_cmd)
+            params_len = len(params)
 
             # Check if is internal command type.
             iicp = command.is_internal_command_prefix(cmd)
@@ -83,6 +85,7 @@ def main():
 
             output = "** Default output command... **".encode(constant.ENCODE_TYPE)
 
+            # Check internal command.
             if iic:
                 # NOTE(jenchieh): Check possible command at this moment.
                 if rl_cmd == command.Command.SHUTDOWN.value:
@@ -90,10 +93,13 @@ def main():
                     break
                 if rl_cmd == command.Command.SCREENSHOT.value:
                     logger.info("Taking screenshot...")
+                    output = screenshot.pyscreenshot_screenshot()
                 if rl_cmd == command.Command.DOWNLOAD.value:
-                    # TODO(jenchieh): Need defense programming?
-                    url = params[0]
-                    downloader.download(url)
+                    if params_len >= 1:
+                        url = params[0]
+                        downloader.download(url)
+                        output = "Done downloading the file!".encode(constant.ENCODE_TYPE)
+            # Check regular shell command.
             else:
                 if "cd" in full_cmd:
                     cd_path = params[0]

