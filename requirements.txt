@@ -1,1 +1,1 @@
-wxPython
+pyscreenshot
