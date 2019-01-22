@@ -20,17 +20,17 @@ import logger
 LISTEN_COUNT = 1
 
 
-def process_cmd_continue(in_cmd):
+def process_cmd_continue(full_cmd):
     """Process commmand that need to be continue.
 
-    @param { stirng } in_cmd : Command string.
+    @param { stirng } full_cmd : Command string.
     """
 
     # No need to receive if just changing the directory.
-    if "cd" in in_cmd:
+    if "cd" in full_cmd:
         return True
 
-    if in_cmd == "cls" or in_cmd == "clear":
+    if full_cmd == "cls" or full_cmd == "clear":
         os.system('cls')
         os.system('clear')
         return True
@@ -41,7 +41,7 @@ def get_shell_cmd(path):
     """Prompt the shell info, and receive command input.
 
     @param { string } path : Shell path to prompt.
-    @returns { string } in_cmd : Input command.
+    @returns { string } full_cmd : Input command.
     @returns { boolean } iic : Is internal command?
     @returns { string } rl_cmd : Real command that the internal command
     prefex is removed.
@@ -49,10 +49,10 @@ def get_shell_cmd(path):
     got_input = False
     while not got_input:
         # Get input command.
-        in_cmd = input(path + "$ ")
-        rl_cmd = in_cmd
+        full_cmd = input(path + "$ ")
+        rl_cmd = full_cmd
 
-        cmd, params = command.get_cmd_params(in_cmd)
+        cmd, params = command.get_cmd_params(full_cmd)
 
         # Check if is internal command type.
         iicp = command.is_internal_command_prefix(cmd)
@@ -62,11 +62,11 @@ def get_shell_cmd(path):
             rl_cmd = cmd[1:]
             iic = command.is_internal_command(rl_cmd)
             if not iic:
-                logger.error(f"'{in_cmd}' is not recognized internal command.")
+                logger.error(f"'{full_cmd}' is not recognized internal command.")
                 continue
         got_input = True
 
-    return (in_cmd, iic, rl_cmd)
+    return (full_cmd, iic, rl_cmd)
 
 def __resolve_hp():
     """Resolve host and port."""
@@ -103,7 +103,7 @@ def main():
                     # Receive shell info.
                     path = conn.recv(constant.BUF_SIZE).decode(constant.DECODE_TYPE)
 
-                    in_cmd, iic, rl_cmd = get_shell_cmd(path)
+                    full_cmd, iic, rl_cmd = get_shell_cmd(path)
 
                     # Check shutdown command before receiving.
                     if iic:
@@ -113,7 +113,7 @@ def main():
                             break
 
                     # Send it.
-                    conn.sendall(in_cmd.encode(constant.ENCODE_TYPE))
+                    conn.sendall(full_cmd.encode(constant.ENCODE_TYPE))
 
                     # Check shutdown command before receiving.
                     if iic:
@@ -124,7 +124,7 @@ def main():
                             break
 
 
-                    if process_cmd_continue(in_cmd):
+                    if process_cmd_continue(full_cmd):
                         continue
 
                     # Receive shell command output.
