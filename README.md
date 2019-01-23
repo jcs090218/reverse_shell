@@ -1,6 +1,6 @@
 # Ultimate Reverse Shell #
 
-Desc...
+Reverse shell implementation using Python.
 <br/><br/>
 
 
