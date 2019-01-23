@@ -108,14 +108,18 @@ def main():
                     # Shell info is the path.
                     path = handler.decode(data)
 
-                    valid_internal_cmd = False
+                    valid_cmd = False
                     break_it = False
 
-                    while not valid_internal_cmd:
+                    while not valid_cmd:
+                        # Immediately turn on and wait to disable the flag,
+                        # if not meaning the command is good to send!
+                        valid_cmd = True
+
                         full_cmd, iic, rl_cmd, params = get_shell_cmd(path)
                         params_len = len(params)
 
-                        # NOTE(jenchieh): Check possible command at this moment.
+                        # NOTE(jenchieh): Check valid internal commands.
                         if iic:
                             # Check disconnect command before receiving.
                             if rl_cmd == command.Command.DISCONNECT.value:
@@ -124,11 +128,11 @@ def main():
                             elif rl_cmd == command.Command.DOWNLOAD.value:
                                 if params_len < 1:
                                     logger.error("Cannot download the file without the URL...")
-                                    continue
+                                    valid_cmd = False
+                        # NOTE(jenchieh): Check valid regular shell commands.
                         else:
                             if process_cmd_continue(full_cmd):
-                                continue
-                        valid_internal_cmd = True
+                                valid_cmd = False
 
                     if break_it:
                         break
