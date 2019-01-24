@@ -29,7 +29,7 @@ class Command(enum.Enum):
     # INFO
     WAN_IP = "wan_ip"          # Get the WAN IP
     LAN_IP = "lan_ip"          # Get the LAN IP
-    LOCATION = "gps"           # Get the location from target device.
+    LOCATION = "location"           # Get the location from target device.
 
 
 def get_cmd_params(full_cmd):
