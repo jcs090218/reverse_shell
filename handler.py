@@ -19,3 +19,10 @@ def decode(msg):
     """Package decoder."""
     # TODO(jenchieh): Temporary, I surmise.
     return msg.decode(constant.DECODE_TYPE)
+
+
+def decode_msg(conn):
+    """Decode a simple string message object."""
+    result = conn.recv(constant.BUF_SIZE)
+    msg = decode(result)
+    return msg
