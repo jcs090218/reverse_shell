@@ -8,7 +8,6 @@
 # ========================================================================
 
 
-import geoip
 import locale
 import os
 import socket
@@ -128,8 +127,7 @@ def main():
                         output = handler.encode(lan_ip)
 
                     elif rl_cmd == command.Command.LOCATION.value:
-                        ip_info = geoip.geolite2.lookup_mine()
-                        print(ip_info)
+                        pass
                 # Check regular shell command.
                 else:
                     if "cd" in full_cmd:
