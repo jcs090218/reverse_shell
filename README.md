@@ -37,7 +37,7 @@ python3 target.py [host] [port]
 ## Commands ##
 ```sh
 # Halt
-!dc            Disconnect the target from this host, target will start reconnecting process.
+!dc            Disconnect the target from this host, target will start reconnection process.
 !shutdown      Shutdown both `attacher` and `target`.
 
 # Listen
