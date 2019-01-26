@@ -7,10 +7,11 @@
 #                   Copyright © 2019 by Shen, Jen-Chieh $
 # ========================================================================
 
+import json
+import locale
+import os
 import socket
 import sys
-import os
-import locale
 
 import command
 import constant
@@ -178,8 +179,15 @@ def main():
                             lan_ip = handler.decode_msg(conn)
                             logger.info(f"Target {addr} LAN:IP => {lan_ip}")
 
-                        elif rl_cmd == command.Command.LOCATION.value:
-                            pass
+                        elif rl_cmd == command.Command.GEO_INFO.value:
+                            logger.info("Location command")
+
+                            geojson = handler.decode_msg(conn)
+
+                            parsed = json.loads(geojson)
+
+                            print(json.dumps(parsed, indent=4, sort_keys=True))
+
                     # Check regular shell command.
                     else:
                         # Receive shell command result.

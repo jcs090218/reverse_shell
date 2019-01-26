@@ -7,13 +7,15 @@
 #                   Copyright © 2019 by Shen, Jen-Chieh $
 # ========================================================================
 
-
+import json
 import locale
 import os
 import socket
 from subprocess import *
 import sys
 import time
+
+import geocoder
 
 import command
 import constant
@@ -126,8 +128,13 @@ def main():
                         lan_ip = net.lan_ip()
                         output = handler.encode(lan_ip)
 
-                    elif rl_cmd == command.Command.LOCATION.value:
-                        pass
+                    elif rl_cmd == command.Command.GEO_INFO.value:
+                        g = geocoder.ip(net.wan_ip())
+
+                        data = json.dumps(g.geojson)
+
+                        output = handler.encode(data)
+
                 # Check regular shell command.
                 else:
                     if "cd" in full_cmd:
