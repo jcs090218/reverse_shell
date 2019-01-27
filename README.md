@@ -4,7 +4,7 @@ Reverse shell implementation using Python.
 <br/><br/>
 
 <p align="center">
-  <img src="./screenshot/reverse_shell_01.gif">
+  <img src="./screenshot/reverse_shell_01.gif" with="600" height="339">
 </p>
 
 
