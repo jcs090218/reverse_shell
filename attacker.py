@@ -130,10 +130,6 @@ def main():
                                 if params_len < 1:
                                     logger.error("Cannot download the file without the URL...")
                                     valid_cmd = False
-                        # NOTE(jenchieh): Check valid regular shell commands.
-                        else:
-                            if process_cmd_continue(full_cmd):
-                                valid_cmd = False
 
                     if break_it:
                         break
@@ -190,6 +186,9 @@ def main():
 
                     # Check regular shell command.
                     else:
+                        if process_cmd_continue(full_cmd):
+                            continue
+
                         # Receive shell command result.
                         result = conn.recv(constant.BUF_SIZE)
 
