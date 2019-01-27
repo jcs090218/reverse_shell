@@ -1,4 +1,4 @@
-# Ultimate Reverse Shell #
+# Reverse Shell #
 
 Reverse shell implementation using Python.
 <br/><br/>
