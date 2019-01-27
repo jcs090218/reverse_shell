@@ -3,6 +3,10 @@
 Reverse shell implementation using Python.
 <br/><br/>
 
+<p align="center">
+  <img src="./screenshot/reverse_shell_01.gif">
+</p>
+
 
 ## Installation ##
 **NOTE**: Python 3.6 or higher is required.
