@@ -16,7 +16,7 @@ Reverse shell implementation using Python.
 $ git clone https://github.com/jcs090218/ult_reverse_shell
 
 # change the working directory to reverse shell
-$ cd ult_reverse_shell
+$ cd reverse_shell
 
 # install python3 and python3-pip if not exist
 
