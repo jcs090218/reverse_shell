@@ -12,7 +12,7 @@ Reverse shell implementation using Python.
 
 ```bash
 # clone the repo
-$ git clone https://github.com/jcs090218/ult_reverse_shell
+$ git clone https://github.com/jcs090218/reverse_shell
 
 # change the working directory to reverse shell
 $ cd reverse_shell
